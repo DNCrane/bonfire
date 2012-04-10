@@ -1,0 +1,13 @@
+
+span.usr {
+    width:100px;
+}
+
+div#msg_username {
+    word-wrap:break-word;
+    text-align:right;
+}
+
+div#msg_content {
+    word-wrap:break-word;
+}

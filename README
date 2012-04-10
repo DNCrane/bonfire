@@ -1,0 +1,7 @@
+A chat server/webapp using Tornado.
+
+To run:
+./chat.py
+
+Then in an internet browser go to localhost:8888
+

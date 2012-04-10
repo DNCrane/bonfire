@@ -1,0 +1,16 @@
+<html>
+<body>
+<body bgcolor = "Orange">
+	<h1>Welcome to Bonfire Chat</h1>
+		{% if error %}
+			ERROR: {{error}} 
+		{% end %}
+		<form action="/login" method="post">
+	         	Name: <input type="text" name="name"><br>
+			Password: <input type="password" name="pw" />
+ 
+       			{% raw xsrf_form_html() %} 
+         	<input type="submit" value="Sign in">
+                </form>
+	</body>
+	</html>

@@ -1,0 +1,5 @@
+add vertical scroll bar
+multiple chats
+look at django/tornado communication
+kick people (get IP?)
+make pretty
