@@ -12,6 +12,7 @@ import tornado.ioloop
 import tornado.options
 import tornado.web
 import os.path
+import os
 import uuid
 from tornado.options import define, options
 
@@ -49,6 +50,7 @@ class Application(tornado.web.Application):
             (r"/a/message/new", MessageNewHandler),
             (r"/a/message/updates", MessageUpdatesHandler),
             (r"/messages", MessageHandler),
+	    (r"/upload", UploadFileHandler),
             #(r"/ban", BanHandler),
             ]
 
@@ -269,6 +271,20 @@ class BanHandler(BaseHandler):
         if name not in self.banned_users:
                 self.banned_users.add(name)
 
+#This file takes a POST method with a body containing some file and saves to static/files if under 131kB
+class UploadFileHandler(BaseHandler):
+    def get(self):
+	self.render("uploadfile.html", filename="")
+    def post(self):
+	upload = self.request.files['newfile'][0]
+	self.render("uploadfile.html", filename="File: " + upload['filename'] + " Size: " + str(len(upload['body'])))
+	destination = os.path.join(os.getcwd(), 'static/files/' + upload['filename'])
+	f=open(destination, 'wb')
+	if (len(upload['body']) < 131072):
+        	f.write(upload['body'])
+	else:
+		os.remove(destination)
+        f.close()
 
 def main():
     tornado.options.parse_command_line()

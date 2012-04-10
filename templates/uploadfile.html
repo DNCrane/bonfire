@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <meta charset="utf-8">
+    <title>Bonfire File Upload</title>
+    <meta name="description" content="">
+    <meta name="author" content="">
+  </head>
+  <body>
+	<form action="/upload" enctype="multipart/form-data" method="post">
+	<p>
+	Please specify a file, or a set of files:<br>
+	<input type="file" name="newfile" size="40">
+	</p>
+	<p>
+		{% if filename %}
+			{{filename}} 
+		{% end %}
+	</p>
+
+       	      {% raw xsrf_form_html() %} 
+	<div>
+	<input type="submit" value="Send">
+	</div>
+</body></html>
