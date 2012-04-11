@@ -301,7 +301,7 @@ class UploadFileHandler(BaseHandler):
 	upload = self.request.files['newfile'][0]
 	destination = os.path.join(os.getcwd(), 'static/files/' + upload['filename'])
 	f=open(destination, 'wb')
-	if (len(upload['body']) < 131072):
+	if (len(upload['body']) < 200000):
         	f.write(upload['body'])
 	else:
 		os.remove(destination)
