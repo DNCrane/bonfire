@@ -50,7 +50,8 @@ class Application(tornado.web.Application):
             (r"/a/message/new", MessageNewHandler),
             (r"/a/message/updates", MessageUpdatesHandler),
             (r"/messages", MessageHandler),
-	    (r"/upload", UploadFileHandler),
+	    (r"/upload/(?P<room>[a-zA-Z0-9\-\_]*)", UploadFileHandler),
+	    (r"/files/(?P<filename>[a-zA-Z0-9\-\_\.]*)", FileDownloadHandler),
             #(r"/ban", BanHandler),
             ]
 
@@ -73,6 +74,12 @@ class BaseHandler(tornado.web.RequestHandler):
         if not user: return None
         return user
 
+class FileDownloadHandler(BaseHandler):
+    def get(self,filename):
+	path = os.path.join(os.getcwd(), 'static/files/' + filename)
+	retFile = open(path,"r")
+	self.set_header ('Content-Disposition', 'attachment; filename=' + filename) 
+	self.write(retFile.read())
 
 class MainHandler(BaseHandler):
     @tornado.web.authenticated
@@ -273,11 +280,11 @@ class BanHandler(BaseHandler):
 
 #This file takes a POST method with a body containing some file and saves to static/files if under 131kB
 class UploadFileHandler(BaseHandler):
-    def get(self):
-	self.render("uploadfile.html", filename="")
-    def post(self):
+    def get(self, room):
+	self.render("uploadfile.html", room=room, status="")
+    def post(self, room):
+	self.render("uploadfile.html", room=room, status="File uploaded.");
 	upload = self.request.files['newfile'][0]
-	self.render("uploadfile.html", filename="File: " + upload['filename'] + " Size: " + str(len(upload['body'])))
 	destination = os.path.join(os.getcwd(), 'static/files/' + upload['filename'])
 	f=open(destination, 'wb')
 	if (len(upload['body']) < 131072):
