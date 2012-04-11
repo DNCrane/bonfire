@@ -63,11 +63,10 @@
             </tbody>
 	  </table>
 	</div>
-	<div class="span2 offset10" id="user-pane"> (User pane is under construction)
-         <img src="{{ static_url("imgs/uc21.gif") }}" >
-	  <div class="username"><i class="icon-user"></i> Greg</div>
-	  <div class="username"><i class="icon-user"></i> Davin</div>
-	  <div class="username"><i class="icon-user"></i> Nick</div>
+	<div class="span2 offset10" id="user-pane">
+	  {% for user in users %}
+	  <div class="username"><i class="icon-user"></i> {{ user }}</div>
+	  {% end %}
 	</div>
       </div>
       <div class="row">
