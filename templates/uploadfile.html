@@ -14,7 +14,7 @@
       {
       var form = $("#uploadForm");
       var message = form.formToDict();
-      message["body"] = "http://" + location.hostname + "/static/files/" + escape(document.getElementById('filename').value);
+      message["body"] = "http://" + location.host + "/static/files/" + escape(document.getElementById('filename').value);
       $.postJSON("/a/message/new", message);
       }
     </script>
