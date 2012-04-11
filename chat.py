@@ -107,7 +107,6 @@ class RoomHandler(BaseHandler):
             self.redirect("/room/" + self.get_argument("new_room_name"))
 
 """
-12345123451234512345123451234512345123451234512345123451234512345123451234512345
 waiters_dic is a dictionary from strings (room names) to lists of
 of callbacks (people to inform when a new message arrives)
 
@@ -120,11 +119,8 @@ among other things. Messages are also used to update the user pane,
 though, in which case there is no body.
 """
 class MessageMixin(object):
-    waiters_dic = {} #A dictionary from strings (room names) to lists
-    #of callbacks (people to inform when a new message arrives)
-    #u
-    users_dic = {} #A list from strings (room names) to lists of strings
-    #(names of people who 
+    waiters_dic = {}
+    users_dic = {}
     cache_dic = {}
     cache_size = 200
     
@@ -179,7 +175,6 @@ class MessageMixin(object):
     def new_messages(self, messages, room=None):
         cls = MessageMixin
         room_name = self.get_argument("room")
-
         #logging.info("Sending new message to %r listeners", len(cls.waiters))
         #logging.info(str(cls.waiter_names))
         for callback in cls.waiters_dic[room_name]:
@@ -206,7 +201,7 @@ class MessageNewHandler(BaseHandler, MessageMixin):
         images = []
         img_extensions=[".png",".jpg",".gif","jpeg"]
         for word in body.split(" "):
-            if len(word)>14 and word[-4:] in img_extensions and word[:7]=="http://":
+            if len(word)>14 and word[-4:] in img_extensions and word[:7] in ["http://","https:/"]:
                 images+=[word]
         message = {
             "id": str(uuid.uuid4()),
