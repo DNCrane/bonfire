@@ -77,12 +77,14 @@ class BaseHandler(tornado.web.RequestHandler):
 class MainHandler(BaseHandler):
     @tornado.web.authenticated
     def get(self):
-       	self.render("index.html", rooms=MessageMixin.waiters_dic.keys(), dic=MessageMixin.waiters_dic)
+       	self.render("index.html", rooms=MessageMixin.waiters_dic.keys(), dic=MessageMixin.users_dic)
 
 class RoomHandler(BaseHandler):
     @tornado.web.authenticated
     def get(self, room):
-        self.render("room.html", messages=MessageMixin.cache_dic.get(room, []), room=room)
+        self.render("room.html", messages=MessageMixin.cache_dic.get(room, []),
+                    room=room,
+                    users=MessageMixin.users_dic.get(room,[]))
     def post(self):
         if self.get_argument("new_room_name"):
             self.redirect("/room/" + self.get_argument("new_room_name"))

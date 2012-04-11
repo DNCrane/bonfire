@@ -64,6 +64,9 @@
 	  </table>
 	</div>
 	<div class="span2 offset10" id="user-pane">
+	  {% for user in users %}
+	  <div class="username"><i class="icon-user"></i> {{ user }}</div>
+	  {% end %}
 	</div>
       </div>
       <div class="row">
