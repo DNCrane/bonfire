@@ -136,7 +136,13 @@ var updater = {
 	    node.slideDown();
 	    scrollDown();
 	} else {
-	    $("#user-pane").append(message["user_list"]);
+	    var user_list = eval(message['user_list']);
+	    var users = "";
+	    for (var i = 0; i < user_list.length; i++) {
+		//$("#user-pane").append();
+		users = users+'<div class="username"><i class="icon-user"></i> '+user_list[i]+'</div>';
+	    }
+	    $("#user-pane").html(users);
 	}
     }
 };
