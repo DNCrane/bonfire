@@ -295,16 +295,17 @@ class BanHandler(BaseHandler):
 #This file takes a POST method with a body containing some file and saves to static/files if under 131kB
 class UploadFileHandler(BaseHandler):
     def get(self, room):
-	self.render("uploadfile.html", room=room, status="")
+	self.render("uploadfile.html", room=room, status="", submit=False)
     def post(self, room):
-	self.render("uploadfile.html", room=room, status="File uploaded.");
 	upload = self.request.files['newfile'][0]
 	destination = os.path.join(os.getcwd(), 'static/files/' + upload['filename'])
 	f=open(destination, 'wb')
 	if (len(upload['body']) < 200000):
         	f.write(upload['body'])
+                self.render("uploadfile.html", room=room, status="File uploaded.", submit=False);
 	else:
 		os.remove(destination)
+                self.render("uploadfile.html", room=room, status="Error: File too large.",submit=True);
         f.close()
 
 def main():
