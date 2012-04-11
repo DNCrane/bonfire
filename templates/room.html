@@ -73,17 +73,17 @@
 	<div class="span10" style="position:fixed;bottom:0px;height:50px;">
 	  <!--input class="span10" style="margin-top:10px;"></input-->
           <form action="/a/message/new" method="post" id="messageform">
-            <input class="span10" style="margin-top:10px" name="body" id="message" />
+	    <div style="margin-top:10px;" class="input-prepend">
+	      <!--TODO: modal window -->
+              <a href="javascript:void(0);" onclick="javascript:window.open('http://localhost:8888/upload/{{ room }}');"><span class="add-on"><i class="icon-upload"></i> Upload&nbsp;</span></a>
+              <input class="span9" name="body" id="message" />
+	    </div>
+
 	    <!--input type="submit" value="{{ _("Post") }}"/-->
 	    <input type="hidden" name="room" value="{{ room }}" />
             <input type="hidden" name="next" value="{{ request.path }}"/>
             {% module xsrf_form_html() %}
           </form>
-	</div>
-	<div style="position:fixed; float:right; bottom:10px;
-		    height:30px; width:30px; background-color:#F0F0F0;
-		    padding-left:5px; padding-top:5px">
-	  <img src="{{ static_url("imgs/Paperclip.png") }}" height="28" width="28" onclick="window.open('http://localhost:8888/upload/{{ room }}', 'Upload File', 'width=400,height=200,menubar=no,status=no,toolbar=no');" >
 	</div>
       </div>
     </div> <!-- /container -->
