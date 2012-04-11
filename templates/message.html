@@ -1,6 +1,16 @@
 <tr class="message" id="m{{ message["id"] }}">
   <td><div id="msg_username" class="span2">{{ message["from"] }}</div></td>
-  <td><div class="span10" id="msg_content">{% module linkify(message["body"]) %}</div></td>
+  <td><div class="span10" id="msg_content">{% module linkify(message["body"]) %}
+      <br>
+      <ul class="thumbnails">
+      {% for image in message["images"] %}
+      <li class="thumbnail" style="width:200px">
+      <a href="{{ image }}"><img src="{{ image }}"></img></a>
+      <a href="{{ image }}">{{ image }}</a>
+      </li>
+      {% end %}
+      </ul>
+  </div></td>
 </tr>
 
 

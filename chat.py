@@ -15,6 +15,7 @@ import os.path
 import os
 import uuid
 from tornado.options import define, options
+from httpExists import *
 
 define("port", default=8888, help="run on the given port", type=int)
 
@@ -192,11 +193,18 @@ class MessageNewHandler(BaseHandler, MessageMixin):
 #	else:
         room_name = self.get_argument("room")
         logging.info("Receiving message from room " + room_name)
+        body = self.get_argument("body")
+        images = []
+        img_extensions=[".png",".jpg",".gif",".jpeg"]
+        for word in body.split(" "):
+            if len(word)>4 and word[-4:] in img_extensions and httpExists(word):
+                images+=[word]
         message = {
             "id": str(uuid.uuid4()),
             "from": self.current_user,
             "user_type": self.get_secure_cookie("user_type"),
-            "body": self.get_argument("body"),
+            "body": body,
+            "images": images,
             "user_list": str(list(MessageMixin.users_dic[room_name])),
             }	        
         message["html"] = self.render_string("message.html", message=message)
