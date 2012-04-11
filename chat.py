@@ -16,6 +16,7 @@ import os
 import uuid
 from tornado.options import define, options
 from httpExists import *
+import string
 
 define("port", default=8888, help="run on the given port", type=int)
 
@@ -85,7 +86,7 @@ class FileDownloadHandler(BaseHandler):
 class MainHandler(BaseHandler):
     @tornado.web.authenticated
     def get(self):
-       	self.render("index.html", rooms=MessageMixin.waiters_dic.keys(), dic=MessageMixin.users_dic)
+       	self.render("index.html", rooms=MessageMixin.waiters_dic.keys(), dic=MessageMixin.users_dic, error=None)
 
 class RoomHandler(BaseHandler):
     @tornado.web.authenticated
@@ -96,6 +97,13 @@ class RoomHandler(BaseHandler):
     def post(self):
         new_room = self.get_argument("new_room_name")
         if new_room:
+            for c in new_room:
+                if c not in string.letters + string.digits + "-_":
+                    self.render("index.html",
+                                rooms=MessageMixin.waiters_dic.keys(),
+                                dic=MessageMixin.users_dic,
+                                error = "Invalid character " + c + " in room name.")
+                                
             self.redirect("/room/" + self.get_argument("new_room_name"))
 
 """
