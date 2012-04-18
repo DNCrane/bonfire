@@ -1,10 +1,21 @@
 #!/usr/bin/env python
 #
 # Copyright 2009 Facebook
-#	was chatdemo.py included with tornado but hacked by sean to support inputting your own username instead of their google auth
-# 	note: the google auth remains here but is unused. in case we want to add it later!
-#		1/30/12
-#Hacked by Nick for Bonfire
+# Licensed under the Apache License, Version 2.0 (the "License"); you may
+# not use this file except in compliance with the License. You may obtain
+# a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+# WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+# License for the specific language governing permissions and limitations
+# under the License.
+#
+# Based on chatdemo.py included with tornado.
+#
+
 import logging
 import tornado.auth
 import tornado.escape
@@ -292,7 +303,7 @@ class BanHandler(BaseHandler):
         if name not in self.banned_users:
                 self.banned_users.add(name)
 
-#This file takes a POST method with a body containing some file and saves to static/files if under 131kB
+#This file takes a POST method with a body containing some file and saves to static/files if under 200kB
 class UploadFileHandler(BaseHandler):
     def get(self, room):
 	self.render("uploadfile.html", room=room, status="", submit=False)
