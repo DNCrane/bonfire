@@ -24,6 +24,7 @@ import tornado.options
 import tornado.web
 import os.path
 import os
+import xml.dom.minidom
 import uuid
 from tornado.options import define, options
 from httpExists import *
@@ -106,7 +107,8 @@ class RoomHandler(BaseHandler):
                     room=room,
                     users=MessageMixin.users_dic.get(room,[]))
     def post(self):
-        new_room = self.get_argument("new_room_name")
+        new_room = self.get_argument("new_room_name")	
+
         if new_room:
             for c in new_room:
                 if c not in string.letters + string.digits + "-_":
@@ -114,8 +116,37 @@ class RoomHandler(BaseHandler):
                                 rooms=MessageMixin.waiters_dic.keys(),
                                 dic=MessageMixin.users_dic,
                                 error = "Invalid character " + c + " in room name.")
-                                
+            
+	    #if log doesn't exist, create file                    
+	    if not os.path.exists(new_room + '.xml'):
+		doc = xml.dom.minidom.Document()
+		chat_log = doc.createElementNS("Bonfire", "log")
+		doc.appendChild(chat_log)
+		with open(new_room + '.xml', "w") as f:
+			f.write(doc.toxml())
             self.redirect("/room/" + self.get_argument("new_room_name"))
+	    #Parse and display log
+	    doc = xml.dom.minidom.parse(new_room + '.xml')
+	    MessageList = doc.getElementsByTagName('message')
+	    i = 0
+	    for node in MessageList:
+		self.addMessage(node)
+
+    #Function to add messages from log to cache
+    def addMessage(self, node):
+	new_room = self.get_argument("new_room_name")
+	cls = MessageMixin
+	message = {
+	    "id": str(uuid.uuid4()),
+	    "from": node.childNodes[1].childNodes[0].nodeValue,
+	    "user_type": "user",
+	    "body": node.childNodes[0].childNodes[0].nodeValue,
+	    "images": [],
+    	    "user_list": [],
+	    }
+	message["html"] = self.render_string("message.html", message=message)
+	if new_room not in cls.cache_dic: cls.cache_dic[new_room] = []
+        cls.cache_dic[new_room].extend([message])
 
 """
 waiters_dic is a dictionary from strings (room names) to lists of
@@ -138,7 +169,8 @@ class MessageMixin(object):
     def wait_for_messages(self, callback, cursor=None):
         room_name = self.get_argument("room")
         cls = MessageMixin
-        if room_name not in cls.cache_dic: cls.cache_dic[room_name] = []
+        if room_name not in cls.cache_dic: 
+	    cls.cache_dic[room_name] = []
         if room_name not in cls.users_dic: cls.users_dic[room_name] = set()
         if cursor:
             cache = cls.cache_dic[room_name]
@@ -228,6 +260,22 @@ class MessageNewHandler(BaseHandler, MessageMixin):
         else:
             self.write(message)
             self.new_messages([message])
+
+	# Add message to xml log
+	doc = xml.dom.minidom.parse(room_name + '.xml')
+	message_element = doc.createElementNS("Bonfire", "message")
+	body_element = doc.createElementNS("Bonfire", "body")
+	from_element = doc.createElementNS("Bonfire", "from")
+	chat_log = doc.childNodes[0]
+	messagebody = doc.createTextNode(message["body"])
+	messagefrom = doc.createTextNode(message["from"])
+	chat_log.appendChild(message_element)
+	message_element.appendChild(body_element)
+	body_element.appendChild(messagebody)
+	message_element.appendChild(from_element)
+	from_element.appendChild(messagefrom)
+	with open(room_name + '.xml', "w") as f:
+		f.write(doc.toxml())
 
 
 class MessageUpdatesHandler(BaseHandler, MessageMixin):
