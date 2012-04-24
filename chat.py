@@ -334,8 +334,7 @@ class LogoutHandler(BaseHandler):
         name=self.get_secure_cookie("user")
         LoginHandler.users.discard(name)
         self.clear_cookie("user")
-        self.write("You are now logged out.<br>")
-	self.write('<a href="login">Log in</a>')
+        self.render("logout.html")
 
 class MessageHandler(BaseHandler): #I wrote this to see what's in the message cache. Pretty sure it's all the messages.
     def get(self):
