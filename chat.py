@@ -99,7 +99,8 @@ class FileDownloadHandler(BaseHandler):
 class MainHandler(BaseHandler):
     @tornado.web.authenticated
     def get(self):
-       	self.render("index.html", rooms=MessageMixin.waiters_dic.keys(), dic=MessageMixin.users_dic, error=None)
+       	self.render("index.html", rooms=MessageMixin.waiters_dic.keys(), dic=MessageMixin.users_dic, 
+                    has_pw=MessageMixin.has_pw_dic,error=None)
 
 class RoomLoginHandler(BaseHandler):
     def post(self):
@@ -130,9 +131,11 @@ class RoomHandler(BaseHandler):
         new_room = self.get_argument("new_room_name")
         new_room_pass = self.get_argument("new_room_pass", None)
         pw_dic = MessageMixin.rooms_pw_dic
+        has_pw_dic = MessageMixin.has_pw_dic
 
         if not pw_dic.has_key(new_room) and new_room_pass != None:
             pw_dic[new_room] = new_room_pass
+            has_pw_dic[new_room] = True
             self.clear_cookie(new_room)
             self.set_secure_cookie(new_room, new_room_pass)
 
@@ -158,6 +161,8 @@ class RoomHandler(BaseHandler):
 	    i = 0
 	    for node in MessageList:
 		self.addMessage(node)
+
+        self.redirect("/room/" + self.get_argument("new_room_name"))
 
     #Function to add messages from log to cache
     def addMessage(self, node):
@@ -190,7 +195,8 @@ though, in which case there is no body.
 rooms_pw_dic holds room passwords here because couldn't get it to work elsewhere
 """
 class MessageMixin(object):
-    rooms_pw_dic = { }
+    rooms_pw_dic = {}
+    has_pw_dic = {}
     waiters_dic = {}
     users_dic = {}
     cache_dic = {}

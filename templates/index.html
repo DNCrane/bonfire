@@ -45,9 +45,10 @@
 	      <tr class="room">
 		<td><div class="span3"><h4>Room Name</h4></div></td>
 		<td><div class="span2"><h4>Now Chatting</h4></div></td>
+		<td><div class="span2"><h4>Password</h4></div></td>
 	      </tr>
               {% for room in rooms %}
-              {% module Template("room_info.html", room=room, dic=dic) %}
+              {% module Template("room_info.html", room=room, dic=dic, has_pw=has_pw) %}
               {% end %}
 	      
             </tbody>
