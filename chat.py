@@ -61,6 +61,7 @@ class Application(tornado.web.Application):
             (r"/room/(?P<room>[a-zA-Z0-9\-\_]*)", RoomHandler),
             (r"/login", LoginHandler),
             (r"/logout", LogoutHandler),
+            (r"/roomlogin", RoomLoginHandler),
             (r"/a/message/new", MessageNewHandler),
             (r"/a/message/updates", MessageUpdatesHandler),
             (r"/messages", MessageHandler),
@@ -100,14 +101,40 @@ class MainHandler(BaseHandler):
     def get(self):
        	self.render("index.html", rooms=MessageMixin.waiters_dic.keys(), dic=MessageMixin.users_dic, error=None)
 
+class RoomLoginHandler(BaseHandler):
+    def post(self):
+        room_name = self.get_argument("room_name")
+        room_pass = self.get_argument("room_password")
+        self.clear_cookie(room_name)
+        self.set_secure_cookie(room_name,room_pass)
+        self.redirect("/room/"+room_name)
+
 class RoomHandler(BaseHandler):
     @tornado.web.authenticated
     def get(self, room):
-        self.render("room.html", messages=MessageMixin.cache_dic.get(room, []),
-                    room=room,
-                    users=MessageMixin.users_dic.get(room,[]))
+        password = self.get_secure_cookie(room)
+        pw_dic = MessageMixin.rooms_pw_dic
+
+        if not pw_dic.has_key(room):
+            self.render("room.html", messages = MessageMixin.cache_dic.get(room, []),
+                    room = room,
+                    users = MessageMixin.users_dic.get(room,[]))
+        elif pw_dic[room] == password:
+            self.render("room.html", messages = MessageMixin.cache_dic.get(room, []),
+                    room = room,
+                    users = MessageMixin.users_dic.get(room,[]))
+        else:
+            self.render("roomlogin.html", room = room)
+
     def post(self):
-        new_room = self.get_argument("new_room_name")	
+        new_room = self.get_argument("new_room_name")
+        new_room_pass = self.get_argument("new_room_pass", None)
+        pw_dic = MessageMixin.rooms_pw_dic
+
+        if not pw_dic.has_key(new_room) and new_room_pass != None:
+            pw_dic[new_room] = new_room_pass
+            self.clear_cookie(new_room)
+            self.set_secure_cookie(new_room, new_room_pass)
 
         if new_room:
             for c in new_room:
@@ -116,14 +143,14 @@ class RoomHandler(BaseHandler):
                                 rooms=MessageMixin.waiters_dic.keys(),
                                 dic=MessageMixin.users_dic,
                                 error = "Invalid character " + c + " in room name.")
-            
+        
 	    #if log doesn't exist, create file                    
-	    if not os.path.exists(new_room + '.xml'):
-		doc = xml.dom.minidom.Document()
-		chat_log = doc.createElementNS("Bonfire", "log")
-		doc.appendChild(chat_log)
-		with open(new_room + '.xml', "w") as f:
-			f.write(doc.toxml())
+        if not os.path.exists(new_room + '.xml'):
+            doc = xml.dom.minidom.Document()
+            chat_log = doc.createElementNS("Bonfire", "log")
+            doc.appendChild(chat_log)
+            with open(new_room + '.xml', "w") as f:
+                f.write(doc.toxml())
             self.redirect("/room/" + self.get_argument("new_room_name"))
 	    #Parse and display log
 	    doc = xml.dom.minidom.parse(new_room + '.xml')
@@ -159,8 +186,11 @@ cache_dic is a list from strings (room names) to lists of messages.
 Messages are dictionaries which typically include a body and a user,
 among other things. Messages are also used to update the user pane,
 though, in which case there is no body.
+
+rooms_pw_dic holds room passwords here because couldn't get it to work elsewhere
 """
 class MessageMixin(object):
+    rooms_pw_dic = { }
     waiters_dic = {}
     users_dic = {}
     cache_dic = {}
