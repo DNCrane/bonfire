@@ -1,9 +1,11 @@
 <tr class="room">
-  <td><a href="/room/{{ room }}"><div id="room_name" class="span3">{{ room }}</div></a></td>
+  <td><a href="/room/{{ room }}"><div id="room_name" class="span3">
+	{{ room }}
+      {% if has_pw.has_key(room) %}
+      <i class="icon-lock"></i>
+      {% end %}	
+  </div></a></td>
   <td><a href="/room/{{ room }}"><div id="room_members" class="span2">{% raw len(dic[room]) %}</div></a></td>
-  <td><div id="locked" class="span2" style="text-align:center"><img src= "{% if has_pw.has_key(room) %}
-  																{{ static_url("imgs/lock.png") }}
-  																{% end %} " width="10" height="10"></div></td>
 </tr>
 
 
