@@ -278,7 +278,9 @@ class MessageNewHandler(BaseHandler, MessageMixin):
         logging.info("Receiving message from room " + room_name)
         body = self.get_argument("body")
         images = []
-        img_extensions=[".png",".jpg",".gif","jpeg"]
+        img_extensions=[".png",".jpg",".gif","jpeg",
+                        ".PNG",".JPG",".GIF","JPEG",
+                        "webp","WEBP"]
         for word in body.split(" "):
             if len(word)>14 and word[-4:] in img_extensions and word[:7] in ["http://","https:/"]:
                 images+=[word]
