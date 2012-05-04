@@ -43,11 +43,7 @@ the MessageMixin class. The dictionary waiters_dic maps room names to lists of l
 So we hang onto callbacks for all of the clients that requested to wait for messages, and
 when a message finally arrives, we inform all of them using the callback. This is done in
 new_messages in MessageMixin. Our list of listeners is then cleared, so people waiting
-in the chatroom have to send another request in order to receive later messages. I'm not
-really sure why it's done this way -- it seems like we should just be able to hold onto
-the same callback until the listener disconnects (closing connections is described in the
-next paragraph), but this is how the sample chat application did it. If I have time I'll
-try it the way I just described and see if that works.
+in the chatroom have to send another request in order to receive later messages.
 
 If a listener disconnects, cancel_wait is called, which removes the listener from the list of
 listeners.
@@ -82,13 +78,14 @@ class Application(tornado.web.Application):
 	#banned_users = set()
         tornado.web.Application.__init__(self, handlers, **settings)
 
-
+#Class that all methods inherit from
 class BaseHandler(tornado.web.RequestHandler):
     def get_current_user(self):
         user = self.get_secure_cookie("user")
         if not user: return None
         return user
 
+#Handles links when people try to download files.
 class FileDownloadHandler(BaseHandler):
     def get(self,filename):
 	path = os.path.join(os.getcwd(), 'static/files/' + filename)
@@ -96,12 +93,14 @@ class FileDownloadHandler(BaseHandler):
 	self.set_header ('Content-Disposition', 'attachment; filename=' + filename) 
 	self.write(retFile.read())
 
+#Main website handler for base web address.
 class MainHandler(BaseHandler):
     @tornado.web.authenticated
     def get(self):
        	self.render("index.html", rooms=MessageMixin.waiters_dic.keys(), dic=MessageMixin.users_dic, 
                     has_pw=MessageMixin.has_pw_dic,error=None)
 
+#When you log into the server it creates cookies
 class RoomLoginHandler(BaseHandler):
     def post(self):
         room_name = self.get_argument("room_name")
@@ -110,6 +109,7 @@ class RoomLoginHandler(BaseHandler):
         self.set_secure_cookie(room_name,room_pass)
         self.redirect("/room/"+room_name)
 
+#Handles links to rooms
 class RoomHandler(BaseHandler):
     @tornado.web.authenticated
     def get(self, room):
